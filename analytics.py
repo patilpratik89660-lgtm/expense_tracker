@@ -1,9 +1,21 @@
-class Expense:
-    def __init__(self, title, amount, category, date):
-        self.title = title
-        self.amount = amount
-        self.category = category
-        self.date = date
+import sqlite3
 
-    def to_tuple(self):
-        return (self.title, self.amount, self.category, self.date)
+def connect():
+    return sqlite3.connect("data.db", check_same_thread=False)
+
+def create_table():
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS expenses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT,
+        amount REAL,
+        category TEXT,
+        date TEXT
+    )
+    """)
+
+    conn.commit()
+    conn.close()
