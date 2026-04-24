@@ -1,22 +1,11 @@
-import streamlit as st
-from groq import Groq
+import pandas as pd
+from db import connect
 
-def generate_insights(df):
-    client = Groq(api_key=st.secrets["GROQ_API_KEY"])
-
-    prompt = f"""
-    Analyze the following expense data:
-
-    {df.to_string()}
-
-    Provide:
-    - Spending patterns
-    - Cost-cutting suggestions
-    """
-
-    response = client.chat.completions.create(
-        model="llama3-70b-8192",
-        messages=[{"role": "user", "content": prompt}]
+def analyze_expenses_df():
+    conn = connect()
+    df = pd.read_sql_query("SELECT * FROM expenses", conn)
+    conn.close()
+    return df
     )
 
     return response.choices[0].message.content
