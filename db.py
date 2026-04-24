@@ -1,8 +1,23 @@
-import pandas as pd
 from db import connect
 
-def analyze_expenses_df():
+def add_expense(expense):
     conn = connect()
-    df = pd.read_sql_query("SELECT * FROM expenses", conn)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "INSERT INTO expenses (title, amount, category, date) VALUES (?, ?, ?, ?)",
+        expense.to_tuple()
+    )
+
+    conn.commit()
     conn.close()
-    return df
+
+def view_expenses():
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM expenses")
+    rows = cursor.fetchall()
+
+    conn.close()
+    return rows
