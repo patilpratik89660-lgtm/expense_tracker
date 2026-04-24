@@ -1,21 +1,22 @@
-import sqlite3
+import streamlit as st
+from groq import Groq
 
-def connect():
-    return sqlite3.connect("data.db", check_same_thread=False)
+def generate_insights(df):
+    client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
-def create_table():
-    conn = connect()
-    cursor = conn.cursor()
+    prompt = f"""
+    Analyze the following expense data:
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS expenses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT,
-        amount REAL,
-        category TEXT,
-        date TEXT
+    {df.to_string()}
+
+    Provide:
+    - Spending patterns
+    - Cost-cutting suggestions
+    """
+
+    response = client.chat.completions.create(
+        model="llama3-70b-8192",
+        messages=[{"role": "user", "content": prompt}]
     )
-    """)
 
-    conn.commit()
-    conn.close()
+    return response.choices[0].message.content
